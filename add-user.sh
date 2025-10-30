@@ -21,12 +21,18 @@ from werkzeug.security import generate_password_hash
 import sys
 print(generate_password_hash(sys.argv[1]))
 PY
+  "$2"
+}
+
+supports_werkzeug() {
+  CMD="$1"
+  "$CMD" -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('werkzeug.security') else 1)" >/dev/null 2>&1
 }
 
 # 1) Lokales Python bevorzugen, 2) python3, 3) Docker-Fallback via gebautem Image
-if command -v python >/dev/null 2>&1; then
+if command -v python >/dev/null 2>&1 && supports_werkzeug python; then
   HASH=$(gen_hash_with_python python "$PASSWORD")
-elif command -v python3 >/dev/null 2>&1; then
+elif command -v python3 >/dev/null 2>&1 && supports_werkzeug python3; then
   HASH=$(gen_hash_with_python python3 "$PASSWORD")
 else
   echo "Kein lokales Python gefunden. Nutze Docker-Image als Fallback..."

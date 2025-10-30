@@ -47,8 +47,8 @@
               <pre class="bg-light p-2 border rounded" style="max-height: 260px; overflow:auto;">{{ h.inbound | tojson(indent=2) }}</pre>
             </div>
             <div class="col-md-6 mb-3">
-              <div class="fw-semibold">An Discord gesendet</div>
-              <pre class="bg-light p-2 border rounded" style="max-height: 260px; overflow:auto;">{{ h.outbound }}</pre>
+              <div class="fw-semibold">An Discord gesendet (JSON)</div>
+              <pre class="bg-light p-2 border rounded" style="max-height: 260px; overflow:auto;">{{ h.outbound | tojson(indent=2) }}</pre>
             </div>
           </div>
         </div>

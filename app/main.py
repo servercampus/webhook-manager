@@ -87,25 +87,49 @@ def hook(wid):
         abort(401)
 
     payload = request.json or {}
-    repo = payload.get("repository", {}).get("full_name", "Unbekanntes Repository")
+    repo_info = payload.get("repository", {})
+    repo_full = repo_info.get("full_name", "Unbekanntes Repository")
+    repo_url = repo_info.get("html_url") or repo_info.get("url")
+    branch_ref = (payload.get("ref") or "").split("/", 2)
+    branch = branch_ref[2] if len(branch_ref) >= 3 else payload.get("ref") or "unknown"
+    pusher = (payload.get("pusher") or {}).get("name") or (payload.get("sender") or {}).get("login") or "unbekannt"
+
     commits = payload.get("commits", [])
-    lines = [f"{repo}: neue Commits"]
-    for c in commits:
-        message = c.get("message")
-        author = (c.get("author") or {}).get("name")
-        lines.append(f"- {message} — {author}")
-    content = "\n".join(lines) if lines else "Update"
+    # Beschränke auf 10 Zeilen für die Embed-Description
+    lines = []
+    for c in commits[:10]:
+        message = (c.get("message") or "").strip().replace("\r", " ")
+        author = (c.get("author") or {}).get("name") or (c.get("committer") or {}).get("name") or "?"
+        url = c.get("url")
+        sha = (c.get("id") or "")[:7]
+        if url:
+            lines.append(f"[`{sha}`]({url}) {message} — {author}")
+        else:
+            lines.append(f"`{sha}` {message} — {author}")
+    description = "\n".join(lines) if lines else "(Keine Commit-Nachrichten)"
+
+    embed = {
+        "title": f"{repo_full} — Push auf {branch}",
+        "url": repo_url,
+        "description": description,
+        "color": 0x2b6cb0,
+        "fields": [
+            {"name": "Commits", "value": str(len(commits)), "inline": True},
+            {"name": "Pusher", "value": pusher, "inline": True},
+        ],
+    }
+    outbound_payload = {"embeds": [embed]}
 
     status = "sent"
     try:
-        resp = requests.post(wh["discord_url"], json={"content": content}, timeout=10)
+        resp = requests.post(wh["discord_url"], json=outbound_payload, timeout=10)
         if not (200 <= resp.status_code < 300):
             status = f"discord_status_{resp.status_code}"
     except Exception:
         status = "discord_error"
     finally:
         try:
-            append_history(wid, payload, content, status)
+            append_history(wid, payload, outbound_payload, status)
         except Exception:
             pass
     return {"status": "ok"}

@@ -29,4 +29,34 @@
   </div>
   <div class="card-footer text-muted">Nur sichtbar, wenn angemeldet.</div>
   </div>
+
+<div class="card mt-4">
+  <div class="card-header">Verlauf</div>
+  <div class="card-body">
+    {% if history %}
+      <div class="list-group">
+        {% for h in history %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>{{ h.ts }}</strong>
+            <span class="badge bg-secondary">{{ h.status }}</span>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+              <div class="fw-semibold">Eingehender GitHub-Payload</div>
+              <pre class="bg-light p-2 border rounded" style="max-height: 260px; overflow:auto;">{{ h.inbound | tojson(indent=2) }}</pre>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="fw-semibold">An Discord gesendet</div>
+              <pre class="bg-light p-2 border rounded" style="max-height: 260px; overflow:auto;">{{ h.outbound }}</pre>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-muted">Noch kein Verlauf vorhanden.</div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

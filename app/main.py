@@ -4,7 +4,7 @@ import hashlib
 import requests
 from flask import Flask, request, render_template, redirect, url_for, abort, session, flash
 from auth import login_required, verify_credentials
-from storage import add_webhook, get_webhook, get_all_webhooks, delete_webhook
+from storage import add_webhook, get_webhook, get_all_webhooks, delete_webhook, append_history
 
 
 app = Flask(__name__)
@@ -58,7 +58,8 @@ def show(wid):
         wid=wid,
         webhook_url=webhook_url,
         discord_url=wh["discord_url"],
-        secret=wh.get("secret", "")
+        secret=wh.get("secret", ""),
+        history=(wh.get("history") or [])[::-1]
     )
 
 
@@ -95,10 +96,18 @@ def hook(wid):
         lines.append(f"- {message} — {author}")
     content = "\n".join(lines) if lines else "Update"
 
+    status = "sent"
     try:
-        requests.post(wh["discord_url"], json={"content": content}, timeout=10)
+        resp = requests.post(wh["discord_url"], json={"content": content}, timeout=10)
+        if not (200 <= resp.status_code < 300):
+            status = f"discord_status_{resp.status_code}"
     except Exception:
-        pass
+        status = "discord_error"
+    finally:
+        try:
+            append_history(wid, payload, content, status)
+        except Exception:
+            pass
     return {"status": "ok"}
 
 

@@ -35,7 +35,7 @@ def add_webhook(discord_url: str) -> Tuple[str, str]:
     wid = str(uuid.uuid4())[:8]
     secret_value = secrets.token_hex(20)
     data = get_all_webhooks()
-    data[wid] = {"discord_url": discord_url, "secret": secret_value}
+    data[wid] = {"discord_url": discord_url, "secret": secret_value, "history": []}
     _write_json(WEBHOOKS_FILE, data)
     return wid, secret_value
 
@@ -51,6 +51,25 @@ def delete_webhook(wid: str) -> bool:
         _write_json(WEBHOOKS_FILE, data)
         return True
     return False
+
+
+def append_history(wid: str, inbound: dict, outbound_text: str, status: str) -> None:
+    data = get_all_webhooks()
+    if wid not in data:
+        return
+    entry = {
+        "ts": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+        "inbound": inbound,
+        "outbound": outbound_text,
+        "status": status,
+    }
+    hist = data[wid].get("history") or []
+    hist.append(entry)
+    # Optional begrenzen auf letzte 100
+    if len(hist) > 100:
+        hist = hist[-100:]
+    data[wid]["history"] = hist
+    _write_json(WEBHOOKS_FILE, data)
 
 
 def get_all_users() -> Dict[str, str]:

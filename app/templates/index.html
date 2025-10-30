@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header">Neuen Webhook anlegen</div>
+      <div class="card-body">
+        <form method="post" action="/add">
+          <div class="mb-3">
+            <label class="form-label">Discord Webhook URL</label>
+            <input type="url" name="discord_url" class="form-control" placeholder="https://discord.com/api/webhooks/..." required>
+          </div>
+          <button class="btn btn-primary" type="submit">Anlegen</button>
+        </form>
+      </div>
+    </div>
+
+    {% if webhooks %}
+    <div class="card">
+      <div class="card-header">Vorhandene Webhooks</div>
+      <ul class="list-group list-group-flush">
+        {% for wid, data in webhooks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>Webhook {{ wid }}</span>
+          <a class="btn btn-sm btn-outline-secondary" href="/webhook/{{ wid }}">Details</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

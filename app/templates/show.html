@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-header">Webhook erstellt</div>
+  <div class="card-body">
+    <div class="mb-3">
+      <label class="form-label">GitHub Webhook URL</label>
+      <input type="text" class="form-control" readonly value="{{ webhook_url }}">
+      <div class="form-text">Trage diese URL in GitHub als Ziel-URL ein.</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">GitHub Secret</label>
+      <input type="password" class="form-control" readonly value="{{ secret }}">
+      <div class="form-text">Dieses Secret muss in GitHub beim Webhook eingetragen werden.</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Discord Ziel</label>
+      <input type="text" class="form-control" readonly value="{{ discord_url }}">
+    </div>
+    <a href="/" class="btn btn-secondary">Zurück</a>
+  </div>
+  <div class="card-footer text-muted">Nur sichtbar, wenn angemeldet.</div>
+  </div>
+{% endblock %}

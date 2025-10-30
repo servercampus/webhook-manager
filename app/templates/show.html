@@ -10,14 +10,22 @@
     </div>
     <div class="mb-3">
       <label class="form-label">GitHub Secret</label>
-      <input type="password" class="form-control" readonly value="{{ secret }}">
+      <div class="input-group">
+        <input id="gh-secret" type="text" class="form-control" readonly value="{{ secret }}">
+        <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('gh-secret').value)">Kopieren</button>
+      </div>
       <div class="form-text">Dieses Secret muss in GitHub beim Webhook eingetragen werden.</div>
     </div>
     <div class="mb-3">
       <label class="form-label">Discord Ziel</label>
       <input type="text" class="form-control" readonly value="{{ discord_url }}">
     </div>
-    <a href="/" class="btn btn-secondary">Zurück</a>
+    <div class="d-flex gap-2">
+      <a href="/" class="btn btn-secondary">Zurück</a>
+      <form method="post" action="/webhook/{{ wid }}/delete" onsubmit="return confirm('Diesen Webhook wirklich löschen?');">
+        <button class="btn btn-danger" type="submit">Löschen</button>
+      </form>
+    </div>
   </div>
   <div class="card-footer text-muted">Nur sichtbar, wenn angemeldet.</div>
   </div>

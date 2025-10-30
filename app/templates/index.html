@@ -22,7 +22,12 @@
         {% for wid, data in webhooks %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <span>Webhook {{ wid }}</span>
-          <a class="btn btn-sm btn-outline-secondary" href="/webhook/{{ wid }}">Details</a>
+          <div class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-secondary" href="/webhook/{{ wid }}">Details</a>
+            <form method="post" action="/webhook/{{ wid }}/delete" onsubmit="return confirm('Diesen Webhook wirklich löschen?');">
+              <button class="btn btn-sm btn-outline-danger" type="submit">Löschen</button>
+            </form>
+          </div>
         </li>
         {% endfor %}
       </ul>

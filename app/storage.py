@@ -44,6 +44,15 @@ def get_webhook(wid: str) -> Optional[dict]:
     return get_all_webhooks().get(wid)
 
 
+def delete_webhook(wid: str) -> bool:
+    data = get_all_webhooks()
+    if wid in data:
+        del data[wid]
+        _write_json(WEBHOOKS_FILE, data)
+        return True
+    return False
+
+
 def get_all_users() -> Dict[str, str]:
     """Return username -> password_hash"""
     return _read_json(USERS_FILE)
